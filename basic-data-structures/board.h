@@ -2,6 +2,8 @@
 
 #include"square.h"
 
+#include"../assertions.h"
+
 template<typename t>
 struct matrix
 {
@@ -19,6 +21,7 @@ struct matrix
 
 	matrix(size_t height, size_t width, t const& initval = t{})
 	{
+		generic_assert([](){return ((height!=0)&&(width!=0))||((height==0)&&(width==0));});
 		for(auto i = 0; i!=height; ++i)
 		{
 			data.emplace_back({})
@@ -39,16 +42,39 @@ struct matrix
 		return data[ind];
 	}
 
-	std::vector<std::vector<t>> data;	
+	size_t height()
+	{
+		return data.size();
+	}
+
+	size_t length()
+	{
+		generic_assert([&]()->bool
+		{
+			if(height()==0) {return false;}
+			size_t f = data[0].size();
+			for(auto it:data)
+			{
+				if(it.size()!=f) {return false;}
+			}
+			return true;
+		});
+
+		return data[0].size();
+	}
+
+	std::vector<std::vector<t>> data;
 };
 
 template<typename square_t>
 class board
 {
 	
-	board() :
-		squares(8,8)
-	{}
+	board(std::vector<std::vector<square_t>> a = {8,8}) :
+		squares(std::move(a))
+	{
+		generic_assert([](){return a.length()==8 && a.width()==8;});
+	}
 
 
 private:
